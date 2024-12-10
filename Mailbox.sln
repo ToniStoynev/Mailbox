@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailbox.AppHost", "Mailbox.AppHost\Mailbox.AppHost.csproj", "{4370B271-DC0F-4764-821D-8A88759724AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailbox.ServiceDefaults", "Mailbox.ServiceDefaults\Mailbox.ServiceDefaults.csproj", "{BE2C7EC5-5617-4BD2-85E7-05FE794CA8B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailbox.ApiService", "Mailbox.ApiService\Mailbox.ApiService.csproj", "{F8A6E8AD-8F95-4CAE-9E8D-DDD0004F576D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailbox.Web", "Mailbox.Web\Mailbox.Web.csproj", "{5279C8A1-86E1-4D3E-AF03-66A76D2ADE48}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4370B271-DC0F-4764-821D-8A88759724AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4370B271-DC0F-4764-821D-8A88759724AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4370B271-DC0F-4764-821D-8A88759724AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4370B271-DC0F-4764-821D-8A88759724AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE2C7EC5-5617-4BD2-85E7-05FE794CA8B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE2C7EC5-5617-4BD2-85E7-05FE794CA8B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE2C7EC5-5617-4BD2-85E7-05FE794CA8B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE2C7EC5-5617-4BD2-85E7-05FE794CA8B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8A6E8AD-8F95-4CAE-9E8D-DDD0004F576D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8A6E8AD-8F95-4CAE-9E8D-DDD0004F576D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8A6E8AD-8F95-4CAE-9E8D-DDD0004F576D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8A6E8AD-8F95-4CAE-9E8D-DDD0004F576D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5279C8A1-86E1-4D3E-AF03-66A76D2ADE48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5279C8A1-86E1-4D3E-AF03-66A76D2ADE48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5279C8A1-86E1-4D3E-AF03-66A76D2ADE48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5279C8A1-86E1-4D3E-AF03-66A76D2ADE48}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
