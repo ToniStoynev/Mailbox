@@ -1,5 +1,13 @@
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Host.UseOrleans(siloBuilder =>
+{
+    siloBuilder.UseLocalhostClustering();
+    siloBuilder.AddMemoryGrainStorage("mailbox");
+    siloBuilder.UseInMemoryReminderService();
+    siloBuilder.AddMemoryStreams("mailbox");
+});
+
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
