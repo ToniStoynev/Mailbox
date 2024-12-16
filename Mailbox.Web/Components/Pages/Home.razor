@@ -7,7 +7,6 @@
 
 <h3>Mailbox</h3>
 
-<!-- Email List -->
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -22,8 +21,9 @@
             @foreach (var email in _emails)
             {
                 <tr>
+                    <td>@email.From</td>
                     <td>@email.Subject</td>
-                    <td>@DateTime.Now.ToString("g")</td>
+                    <td>@email.Date</td>
                 </tr>
             }
         }

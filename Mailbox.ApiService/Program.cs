@@ -37,7 +37,13 @@ if (app.Environment.IsDevelopment())
 app.MapPost("/sendEmail", async (IGrainFactory grainFactory, [FromBody]SendEmailRequest sendEmailRequest) =>
 {
     var emailGrain = grainFactory.GetGrain<IEmailGrain>(sendEmailRequest.To);
-    await emailGrain.SendEmail(new(Guid.NewGuid(), sendEmailRequest.To, sendEmailRequest.Subject, sendEmailRequest.Body));
+    await emailGrain.SendEmail(new(
+        Guid.NewGuid(), 
+        sendEmailRequest.From, 
+        sendEmailRequest.To, 
+        sendEmailRequest.Subject, 
+        sendEmailRequest.Body,
+        DateTime.Now));
     return Results.Ok();
 });
 
