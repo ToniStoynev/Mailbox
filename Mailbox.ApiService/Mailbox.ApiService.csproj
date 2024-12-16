@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Mailbox.Grains\Mailbox.Grains.csproj" />
     <ProjectReference Include="..\Mailbox.ServiceDefaults\Mailbox.ServiceDefaults.csproj" />
   </ItemGroup>
 
@@ -15,6 +16,7 @@
     <PackageReference Include="Microsoft.Orleans.Reminders" Version="9.0.1" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="9.0.1" />
     <PackageReference Include="Microsoft.Orleans.Streaming" Version="9.0.1" />
+    <PackageReference Include="SignalR.Orleans" Version="7.2.0" />
   </ItemGroup>
 
 </Project>

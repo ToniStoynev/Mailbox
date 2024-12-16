@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailbox.ApiService", "Mailb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailbox.Web", "Mailbox.Web\Mailbox.Web.csproj", "{5279C8A1-86E1-4D3E-AF03-66A76D2ADE48}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailbox.Grains", "Mailbox.Grains\Mailbox.Grains.csproj", "{064C1801-0265-47E1-81A4-793908A5B921}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mailbox.Contracts", "Mailbox.Contracts\Mailbox.Contracts.csproj", "{37E92359-949E-4E1A-9C8B-17311A031309}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{5279C8A1-86E1-4D3E-AF03-66A76D2ADE48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5279C8A1-86E1-4D3E-AF03-66A76D2ADE48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5279C8A1-86E1-4D3E-AF03-66A76D2ADE48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{064C1801-0265-47E1-81A4-793908A5B921}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{064C1801-0265-47E1-81A4-793908A5B921}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{064C1801-0265-47E1-81A4-793908A5B921}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{064C1801-0265-47E1-81A4-793908A5B921}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37E92359-949E-4E1A-9C8B-17311A031309}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37E92359-949E-4E1A-9C8B-17311A031309}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37E92359-949E-4E1A-9C8B-17311A031309}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37E92359-949E-4E1A-9C8B-17311A031309}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
