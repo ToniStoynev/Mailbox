@@ -1,0 +1,22 @@
+﻿@using Mailbox.Contracts
+
+<h3>Email Details</h3>
+
+@if (Email != null)
+{
+    <div>
+        <p><b>From:</b> @Email.From</p>
+        <p><b>Subject:</b> @Email.Subject</p>
+        <p><b>Body:</b></p>
+        <p>@Email.Body</p>
+    </div>
+}
+else
+{
+    <p>No email selected.</p>
+}
+
+@code {
+    [Parameter]
+    public Email? Email { get; set; }
+}

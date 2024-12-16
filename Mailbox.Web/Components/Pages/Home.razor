@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @using global::Mailbox.Contracts
 @using Microsoft.AspNetCore.SignalR.Client
+@inject MailBoxApiClient MailBoxApiClient
 
 <PageTitle>Mailbox</PageTitle>
 
@@ -9,32 +10,37 @@
 
 <table class="table table-bordered">
     <thead>
-        <tr>
-            <th>From</th>
-            <th>Subject</th>
-            <th>Date</th>
-        </tr>
+    <tr>
+        <th>From</th>
+        <th>Subject</th>
+        <th>Date</th>
+    </tr>
     </thead>
     <tbody>
-        @if (_emails.Any())
+    @if (_emails.Any())
+    {
+        @foreach (var email in _emails)
         {
-            @foreach (var email in _emails)
-            {
-                <tr>
-                    <td>@email.From</td>
-                    <td>@email.Subject</td>
-                    <td>@email.Date</td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="3" class="text-center">No emails available.</td>
+            <tr @onclick="() => SelectEmail(email)" style="cursor: pointer;">
+                <td>@email.From</td>
+                <td>@email.Subject</td>
+                <td>@email.Date</td>
             </tr>
         }
+    }
+    else
+    {
+        <tr>
+            <td colspan="3" class="text-center">No emails available.</td>
+        </tr>
+    }
     </tbody>
 </table>
+
+@if (_selectedEmail != null)
+{
+    <EmailDetails Email="_selectedEmail"/>
+}
 
 <!-- Send Email Button -->
 @* <button class="btn btn-primary" @onclick="OpenComposeEmail">New Email</button> *@
@@ -74,24 +80,30 @@
 
 @code {
     private bool _isComposeModalVisible = false;
+    private Email? _selectedEmail;
     private HubConnection? _hubConnection;
-    
+
     private List<Email> _emails = new();
 
     protected override async Task OnInitializedAsync()
     {
-       //_emails = await MailBoxApi.GetEmailsAsync();
+        _emails = await MailBoxApiClient.GetEmailsAsync();
         _hubConnection = new HubConnectionBuilder()
             .WithUrl("http://localhost:5344/emailsHub")
             .Build();
-        
+
         _hubConnection.On<Email>("NewEmailReceived", email =>
         {
             _emails.Add(email);
-             InvokeAsync(StateHasChanged);
+            InvokeAsync(StateHasChanged);
         });
 
         await _hubConnection.StartAsync();
+    }
+
+    private void SelectEmail(Email email)
+    {
+        _selectedEmail = email;
     }
 
     // Email being composed
@@ -127,5 +139,6 @@
     //     }
     //
     //     CloseComposeEmail();
-    }
+}
+
 }
