@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Mailbox.GrainInterfaces</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="9.0.1" />
+      <PackageReference Include="Microsoft.Orleans.Persistence.Memory" Version="9.0.1" />
+      <PackageReference Include="Microsoft.Orleans.Sdk" Version="9.0.1" />
+      <PackageReference Include="SignalR.Orleans" Version="7.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Mailbox.Contracts\Mailbox.Contracts.csproj" />
+    </ItemGroup>
+
+</Project>
