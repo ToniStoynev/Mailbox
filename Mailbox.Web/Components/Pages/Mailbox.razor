@@ -1,7 +1,9 @@
-﻿@page "/"
-@rendermode InteractiveServer
+﻿@page "/mailbox"
 @using global::Mailbox.Contracts
-@using Microsoft.AspNetCore.SignalR.Client
+@attribute [StreamRendering(true)]
+@attribute [OutputCache(Duration = 5)]
+
+@inject MailBoxApiClient MailBoxApi
 
 <PageTitle>Mailbox</PageTitle>
 
@@ -74,24 +76,12 @@
 
 @code {
     private bool _isComposeModalVisible = false;
-    private HubConnection? _hubConnection;
     
     private List<Email> _emails = new();
 
     protected override async Task OnInitializedAsync()
     {
-       //_emails = await MailBoxApi.GetEmailsAsync();
-        _hubConnection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5344/emailsHub")
-            .Build();
-        
-        _hubConnection.On<Email>("NewEmailReceived", email =>
-        {
-            _emails.Add(email);
-             InvokeAsync(StateHasChanged);
-        });
-
-        await _hubConnection.StartAsync();
+        _emails = await MailBoxApi.GetEmailsAsync();
     }
 
     // Email being composed
