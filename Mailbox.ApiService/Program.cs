@@ -1,3 +1,4 @@
+using Mailbox.ApiService.Constants;
 using Mailbox.ApiService.Requests;
 using Mailbox.GrainInterfaces.Hubs;
 using Mailbox.GrainInterfaces.Interfaces;
@@ -54,16 +55,23 @@ app.MapGet("/emails", async (IGrainFactory grainFactory, string userEmailAddress
     return Results.Ok(emails);
 });
 
-app.MapPost("/appointments", async (IGrainFactory grainFactory, [FromBody]ScheduleAppointmentRequest scheduleAppointmentRequest) =>
+app.MapPost("/scheduleAppointment", async (IGrainFactory grainFactory, [FromBody]ScheduleAppointmentRequest scheduleAppointmentRequest) =>
 {
-    var appointmentGrain = grainFactory.GetGrain<IAppointmentGrain>(scheduleAppointmentRequest.Organizer);
-    await appointmentGrain.ScheduleAppointment(
+    var appointmentGrain = grainFactory.GetGrain<IAppointmentGrain>(AppConstants.AppointmentGrainKey);
+    await appointmentGrain.ScheduleAppointment(new(
         scheduleAppointmentRequest.EventName, 
         scheduleAppointmentRequest.Organizer, 
         scheduleAppointmentRequest.Participants, 
         scheduleAppointmentRequest.StartTime, 
-        scheduleAppointmentRequest.EndTime);
+        scheduleAppointmentRequest.EndTime));
     return Results.Ok();
+});
+
+app.MapGet("/appointments", async (IGrainFactory grainFactory, string userEmailAddress) =>
+{
+    var appointmentGrain = grainFactory.GetGrain<IAppointmentGrain>(AppConstants.AppointmentGrainKey);
+    var scheduledAppointments = await appointmentGrain.GetScheduledAppointments(userEmailAddress);
+    return Results.Ok(scheduledAppointments);
 });
 
 app.MapDefaultEndpoints();

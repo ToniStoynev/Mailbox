@@ -1,0 +1,23 @@
+﻿@using Mailbox.Contracts
+
+<h3>Appointment Details</h3>
+
+@if (Appointment != null)
+{
+    <div>
+        <p><b>Name:</b> @Appointment.EventName</p>
+        <p><b>Organizer:</b> @Appointment.Organizer</p>
+        <p><b>Participants:</b> @Appointment.Participants</p>
+        <p><b>StartTime:</b> @Appointment.StartTime</p>
+        <p><b>EndTime:</b> @Appointment.EndTime</p>
+    </div>
+}
+else
+{
+    <p>No email selected.</p>
+}
+
+@code {
+    [Parameter]
+    public Appointment? Appointment { get; set; }
+}

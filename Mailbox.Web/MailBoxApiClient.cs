@@ -31,7 +31,40 @@ public class MailBoxApiClient(HttpClient httpClient)
                 Encoding.UTF8,
                 "application/json");
 
-            await httpClient.PostAsync("/sendEmail", jsonContent);
+            await httpClient.PostAsync("/sendEmail", jsonContent, cancellationToken);
+        }
+        catch(HttpRequestException ex)
+        {
+            Console.WriteLine($"Request error: {ex.Message}");
+        }
+    }
+    
+    public async Task<List<Appointment>> GetAppointmentsAsync(string userEmailAddress, CancellationToken cancellationToken = default)
+    {
+        List<Appointment>? appointments = null;
+
+        await foreach (var appointment in httpClient.GetFromJsonAsAsyncEnumerable<Appointment>($"/appointments?userEmailAddress={userEmailAddress}", cancellationToken))
+        {
+            if (appointment is not null)
+            {
+                appointments ??= [];
+                appointments.Add(appointment);
+            }
+        }
+
+        return appointments ?? [];
+    }
+    
+    public async Task ScheduleAppointmentAsync(Appointment appointment, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using StringContent jsonContent = new(
+                JsonSerializer.Serialize(appointment),
+                Encoding.UTF8,
+                "application/json");
+
+            await httpClient.PostAsync("/scheduleAppointment", jsonContent, cancellationToken);
         }
         catch(HttpRequestException ex)
         {

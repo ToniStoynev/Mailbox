@@ -49,96 +49,212 @@ else
         <EmailDetails Email="_selectedEmail"/>
     }
 
-    <button class="btn btn-primary" @onclick="OpenComposeEmail">New Email</button>
-    @if (_isComposeModalVisible)
-    {
-        <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Compose Email</h5>
-                        <button type="button" class="btn-close" aria-label="Close"
-                                @onclick="CloseComposeEmail"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="toInput" class="form-label">To</label>
-                            <input type="email" class="form-control" id="toInput" @bind="_to"/>
+    <h3>Calendar</h3>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Event</th>
+            <th>Organizer</th>
+            <th>StartTime</th>
+            <th>EndTime</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (_appointments.Any())
+        {
+            @foreach (var appointment in _appointments)
+            {
+                <tr>
+                    <td>@appointment.EventName</td>
+                    <td>@appointment.Organizer</td>
+                    <td>@appointment.StartTime</td>
+                    <td>@appointment.EndTime</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" class="text-center">No scheduled appointments.</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between">
+        <button class="btn btn-primary" @onclick="OpenComposeEmail">New Email</button>
+        @if (_isComposeModalVisible)
+        {
+            <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Compose Email</h5>
+                            <button type="button" class="btn-close" aria-label="Close"
+                                    @onclick="CloseComposeEmail"></button>
                         </div>
-                        <div class="mb-3">
-                            <label for="subjectInput" class="form-label">Subject</label>
-                            <input type="text" class="form-control" id="subjectInput" @bind="_subject"/>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="toInput" class="form-label">To</label>
+                                <input type="email" class="form-control" id="toInput" @bind="_to"/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="subjectInput" class="form-label">Subject</label>
+                                <input type="text" class="form-control" id="subjectInput" @bind="_subject"/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="bodyInput" class="form-label">Body</label>
+                                <textarea class="form-control" id="bodyInput" rows="3" @bind="_body"></textarea>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="bodyInput" class="form-label">Body</label>
-                            <textarea class="form-control" id="bodyInput" rows="3" @bind="_body"></textarea>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" @onclick="CloseComposeEmail">Cancel</button>
+                            <button class="btn btn-primary" @onclick="SendEmail">Send</button>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" @onclick="CloseComposeEmail">Cancel</button>
-                        <button class="btn btn-primary" @onclick="SendEmail">Send</button>
                     </div>
                 </div>
             </div>
-        </div>
-    }
-}
+        }
 
-
-@code {
-    [Parameter] public string? UserEmailAddress { get; set; }
-
-    private bool _isComposeModalVisible;
-    private Email? _selectedEmail;
-    private HubConnection? _hubConnection;
-    private List<Email> _emails = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (!string.IsNullOrEmpty(UserEmailAddress))
+        <button class="btn btn-primary" @onclick="OpenScheduleAppointment">Schedule Appointment</button>
+        @if (_isScheduleAppointmentModalVisible)
         {
-            _emails = await MailBoxApiClient.GetEmailsAsync(UserEmailAddress);
-            _hubConnection = new HubConnectionBuilder()
-                .WithUrl("http://localhost:5344/emailsHub")
-                .Build();
-            
-            _hubConnection.On<Email>("NewEmailReceived", email =>
+            <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Schedule Appointment</h5>
+                            <button type="button" class="btn-close" aria-label="Close"
+                                    @onclick="CloseScheduleAppointment"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="event" class="form-label">Event</label>
+                                <input type="email" class="form-control" id="event" @bind="_event"/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="participants" class="form-label">Participants (comma-separated)</label>
+                                <input type="text" class="form-control" id="participants" @bind="_participants"/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="startTime" class="form-label">StartDate</label>
+                                <input type="datetime-local" class="form-control" id="startTime" @bind="_startDate"/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="endTime" class="form-label">EndDate</label>
+                                <input type="datetime-local" class="form-control" id="endTime" @bind="_endDate"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" @onclick="CloseScheduleAppointment">Cancel</button>
+                            <button class="btn btn-primary" @onclick="ScheduleAppointment">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @code {
+        [Parameter] public string? UserEmailAddress { get; set; }
+
+        private bool _isComposeModalVisible;
+        private bool _isScheduleAppointmentModalVisible;
+        private string? _to;
+        private string? _subject;
+        private string? _body;
+        private string? _event;
+        private string? _participants;
+        private DateTime? _startDate;
+        private DateTime? _endDate;
+        private Email? _selectedEmail;
+        private HubConnection? _hubConnection;
+        private List<Email> _emails = new();
+        private List<Appointment> _appointments = new();
+
+        protected override async Task OnInitializedAsync()
+        {
+            if (!string.IsNullOrEmpty(UserEmailAddress))
             {
-                _emails.Add(email);
-                InvokeAsync(StateHasChanged);
-            });
+                _emails = await MailBoxApiClient.GetEmailsAsync(UserEmailAddress);
+                _appointments = await MailBoxApiClient.GetAppointmentsAsync(UserEmailAddress);
+                _hubConnection = new HubConnectionBuilder()
+                    .WithUrl("http://localhost:5344/emailsHub")
+                    .Build();
 
-            await _hubConnection.StartAsync();
-            await _hubConnection.SendAsync("JoinGroup", UserEmailAddress);
+                _hubConnection.On<Email>("NewEmailReceived", email =>
+                {
+                    _emails.Add(email);
+                    InvokeAsync(StateHasChanged);
+                });
+                
+                _hubConnection.On<Appointment>("NewAppointmentScheduled", appointment =>
+                {
+                    if (!IsInteresedInTheAppointment(appointment, UserEmailAddress)) 
+                        return;
+                    _appointments.Add(appointment);
+                    InvokeAsync(StateHasChanged);
+                });
+
+                await _hubConnection.StartAsync();
+                await _hubConnection.SendAsync("JoinGroup", UserEmailAddress);
+            }
         }
-    }
 
-    private void SelectEmail(Email email)
-    {
-        _selectedEmail = email;
-    }
+        private bool IsInteresedInTheAppointment(Appointment appointment, string userEmailAddress) 
+            => appointment.Organizer == UserEmailAddress || appointment.Participants.Contains(userEmailAddress);
 
-    private string? _to;
-    private string? _subject;
-    private string? _body;
-
-    private void OpenComposeEmail()
-    {
-        _isComposeModalVisible = true;
-    }
-
-    private void CloseComposeEmail()
-    {
-        _isComposeModalVisible = false;
-    }
-
-    private async Task SendEmail()
-    {
-        if (!string.IsNullOrWhiteSpace(_to) && !string.IsNullOrWhiteSpace(_subject))
+        private void SelectEmail(Email email)
         {
-            await MailBoxApiClient.SendEmailsAsync(new Email(Guid.NewGuid(), UserEmailAddress!, _to, _subject, _body, DateTime.Now));
+            _selectedEmail = email;
         }
 
-        CloseComposeEmail();
+        private void OpenComposeEmail()
+        {
+            _isComposeModalVisible = true;
+        }
+
+        private void CloseComposeEmail()
+        {
+            _isComposeModalVisible = false;
+        }
+
+        private async Task SendEmail()
+        {
+            if (!string.IsNullOrWhiteSpace(_to) && !string.IsNullOrWhiteSpace(_subject))
+            {
+                await MailBoxApiClient.SendEmailsAsync(new Email(Guid.NewGuid(), UserEmailAddress!, _to, _subject, _body!, DateTime.Now));
+            }
+
+            CloseComposeEmail();
+        }
+
+        private void OpenScheduleAppointment()
+        {
+            _isScheduleAppointmentModalVisible = true;
+        }
+
+        private void CloseScheduleAppointment()
+        {
+            _isScheduleAppointmentModalVisible = false;
+        }
+
+        private async Task ScheduleAppointment()
+        {
+            if (!string.IsNullOrWhiteSpace(_event) && !string.IsNullOrWhiteSpace(_participants) && _startDate is not null && _endDate is not null)
+            {
+                var participants = _participants.Split(", ").ToList();
+                await MailBoxApiClient.ScheduleAppointmentAsync(new Appointment(
+                    _event,
+                    UserEmailAddress!,
+                    participants,
+                    _startDate.Value,
+                    _endDate.Value
+                ));
+            }
+
+            CloseScheduleAppointment();
+        }
     }
 }

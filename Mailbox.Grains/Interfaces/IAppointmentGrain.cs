@@ -1,6 +1,10 @@
-﻿namespace Mailbox.GrainInterfaces.Interfaces;
+﻿using Mailbox.Contracts;
+
+namespace Mailbox.GrainInterfaces.Interfaces;
 
 public interface IAppointmentGrain : IGrainWithStringKey
 {
-    Task ScheduleAppointment(string eventName, string organizer, List<string> participants, DateTime startTime, DateTime endTime);
+    Task ScheduleAppointment(Appointment appointment);
+    
+    Task<List<Appointment>> GetScheduledAppointments(string userEmailAddress);
 }
