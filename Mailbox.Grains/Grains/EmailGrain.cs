@@ -13,7 +13,7 @@ public class EmailGrain([PersistentState(stateName: "email", storageName: "mailb
     {
         emails.State.Add(email);
         await emails.WriteStateAsync();
-        await emailHubContext.Clients.All.SendAsync("NewEmailReceived", email);
+        await emailHubContext.Clients.Group(email.To).SendAsync("NewEmailReceived", email);
     }
 
     public Task<List<Email>> GetReceivedEmails() => Task.FromResult(emails.State);

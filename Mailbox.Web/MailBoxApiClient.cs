@@ -1,19 +1,17 @@
+using System.Text;
+using System.Text.Json;
 using Mailbox.Contracts;
 
 namespace Mailbox.Web;
 
 public class MailBoxApiClient(HttpClient httpClient)
 {
-    public async Task<List<Email>> GetEmailsAsync(int maxItems = 10, CancellationToken cancellationToken = default)
+    public async Task<List<Email>> GetEmailsAsync(string userEmailAddress, CancellationToken cancellationToken = default)
     {
         List<Email>? emails = null;
 
-        await foreach (var email in httpClient.GetFromJsonAsAsyncEnumerable<Email>("/emails?userEmailAddress=toni.stoinev@gmail.com", cancellationToken))
+        await foreach (var email in httpClient.GetFromJsonAsAsyncEnumerable<Email>($"/emails?userEmailAddress={userEmailAddress}", cancellationToken))
         {
-            if (emails?.Count >= maxItems)
-            {
-                break;
-            }
             if (email is not null)
             {
                 emails ??= [];
@@ -22,6 +20,23 @@ public class MailBoxApiClient(HttpClient httpClient)
         }
 
         return emails ?? [];
+    }
+    
+    public async Task SendEmailsAsync(Email email, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using StringContent jsonContent = new(
+                JsonSerializer.Serialize(email),
+                Encoding.UTF8,
+                "application/json");
+
+            await httpClient.PostAsync("/sendEmail", jsonContent);
+        }
+        catch(HttpRequestException ex)
+        {
+            Console.WriteLine($"Request error: {ex.Message}");
+        }
     }
 }
 

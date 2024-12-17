@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/{UserEmailAddress?}"
 @rendermode InteractiveServer
 @using global::Mailbox.Contracts
 @using Microsoft.AspNetCore.SignalR.Client
@@ -8,97 +8,109 @@
 
 <h3>Mailbox</h3>
 
-<table class="table table-bordered">
-    <thead>
-    <tr>
-        <th>From</th>
-        <th>Subject</th>
-        <th>Date</th>
-    </tr>
-    </thead>
-    <tbody>
-    @if (_emails.Any())
-    {
-        @foreach (var email in _emails)
+@if (string.IsNullOrEmpty(UserEmailAddress))
+{
+    <h1>No username provided.</h1>
+    <h3>Please provide your username as a route parameter :)</h3>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>From</th>
+            <th>Subject</th>
+            <th>Date</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (_emails.Any())
         {
-            <tr @onclick="() => SelectEmail(email)" style="cursor: pointer;">
-                <td>@email.From</td>
-                <td>@email.Subject</td>
-                <td>@email.Date</td>
+            @foreach (var email in _emails)
+            {
+                <tr @onclick="() => SelectEmail(email)" style="cursor: pointer;">
+                    <td>@email.From</td>
+                    <td>@email.Subject</td>
+                    <td>@email.Date</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" class="text-center">No emails available.</td>
             </tr>
         }
-    }
-    else
-    {
-        <tr>
-            <td colspan="3" class="text-center">No emails available.</td>
-        </tr>
-    }
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
-@if (_selectedEmail != null)
-{
-    <EmailDetails Email="_selectedEmail"/>
+    @if (_selectedEmail != null)
+    {
+        <EmailDetails Email="_selectedEmail"/>
+    }
+
+    <button class="btn btn-primary" @onclick="OpenComposeEmail">New Email</button>
+    @if (_isComposeModalVisible)
+    {
+        <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Compose Email</h5>
+                        <button type="button" class="btn-close" aria-label="Close"
+                                @onclick="CloseComposeEmail"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="toInput" class="form-label">To</label>
+                            <input type="email" class="form-control" id="toInput" @bind="_to"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subjectInput" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subjectInput" @bind="_subject"/>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bodyInput" class="form-label">Body</label>
+                            <textarea class="form-control" id="bodyInput" rows="3" @bind="_body"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" @onclick="CloseComposeEmail">Cancel</button>
+                        <button class="btn btn-primary" @onclick="SendEmail">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 }
 
-<!-- Send Email Button -->
-@* <button class="btn btn-primary" @onclick="OpenComposeEmail">New Email</button> *@
-
-<!-- Compose Email Modal -->
-@* @if (IsComposeModalVisible) *@
-@* { *@
-@*     <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);"> *@
-@*         <div class="modal-dialog"> *@
-@*             <div class="modal-content"> *@
-@*                 <div class="modal-header"> *@
-@*                     <h5 class="modal-title">Compose Email</h5> *@
-@*                     <button type="button" class="btn-close" aria-label="Close" @onclick="CloseComposeEmail"></button> *@
-@*                 </div> *@
-@*                 <div class="modal-body"> *@
-@*                     <div class="mb-3"> *@
-@*                         <label for="toInput" class="form-label">To</label> *@
-@*                         <input type="email" class="form-control" id="toInput" @bind="NewEmail.To" /> *@
-@*                     </div> *@
-@*                     <div class="mb-3"> *@
-@*                         <label for="subjectInput" class="form-label">Subject</label> *@
-@*                         <input type="text" class="form-control" id="subjectInput" @bind="NewEmail.Subject" /> *@
-@*                     </div> *@
-@*                     <div class="mb-3"> *@
-@*                         <label for="bodyInput" class="form-label">Body</label> *@
-@*                         <textarea class="form-control" id="bodyInput" rows="3" @bind="NewEmail.Body"></textarea> *@
-@*                     </div> *@
-@*                 </div> *@
-@*                 <div class="modal-footer"> *@
-@*                     <button class="btn btn-secondary" @onclick="CloseComposeEmail">Cancel</button> *@
-@*                     <button class="btn btn-primary" @onclick="SendEmail">Send</button> *@
-@*                 </div> *@
-@*             </div> *@
-@*         </div> *@
-@*     </div> *@
-@* } *@
 
 @code {
-    private bool _isComposeModalVisible = false;
+    [Parameter] public string? UserEmailAddress { get; set; }
+
+    private bool _isComposeModalVisible;
     private Email? _selectedEmail;
     private HubConnection? _hubConnection;
-
     private List<Email> _emails = new();
 
     protected override async Task OnInitializedAsync()
     {
-        _emails = await MailBoxApiClient.GetEmailsAsync();
-        _hubConnection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5344/emailsHub")
-            .Build();
-
-        _hubConnection.On<Email>("NewEmailReceived", email =>
+        if (!string.IsNullOrEmpty(UserEmailAddress))
         {
-            _emails.Add(email);
-            InvokeAsync(StateHasChanged);
-        });
+            _emails = await MailBoxApiClient.GetEmailsAsync(UserEmailAddress);
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:5344/emailsHub")
+                .Build();
+            
+            _hubConnection.On<Email>("NewEmailReceived", email =>
+            {
+                _emails.Add(email);
+                InvokeAsync(StateHasChanged);
+            });
 
-        await _hubConnection.StartAsync();
+            await _hubConnection.StartAsync();
+            await _hubConnection.SendAsync("JoinGroup", UserEmailAddress);
+        }
     }
 
     private void SelectEmail(Email email)
@@ -106,39 +118,27 @@
         _selectedEmail = email;
     }
 
-    // Email being composed
-    //private Email NewEmail = new Email();
+    private string? _to;
+    private string? _subject;
+    private string? _body;
 
-    // // Open the compose email modal
-    // private void OpenComposeEmail()
-    // {
-    //     NewEmail = new Email(); // Reset the form
-    //     IsComposeModalVisible = true;
-    // }
-    //
-    // // Close the compose email modal
-    // private void CloseComposeEmail()
-    // {
-    //     IsComposeModalVisible = false;
-    // }
-    //
-    // // Simulate sending the email
-    // private void SendEmail()
-    // {
-    //     if (!string.IsNullOrWhiteSpace(NewEmail.To) && !string.IsNullOrWhiteSpace(NewEmail.Subject))
-    //     {
-    //         // Add the new email to the mailbox (as if it's sent)
-    //         Emails.Add(new Email
-    //         {
-    //             //From = "user@example.com", // Assume the logged-in user's email
-    //             To = NewEmail.To,
-    //             Subject = NewEmail.Subject,
-    //             Body = NewEmail.Body,
-    //             //ReceivedDate = DateTime.Now
-    //         });
-    //     }
-    //
-    //     CloseComposeEmail();
-}
+    private void OpenComposeEmail()
+    {
+        _isComposeModalVisible = true;
+    }
 
+    private void CloseComposeEmail()
+    {
+        _isComposeModalVisible = false;
+    }
+
+    private async Task SendEmail()
+    {
+        if (!string.IsNullOrWhiteSpace(_to) && !string.IsNullOrWhiteSpace(_subject))
+        {
+            await MailBoxApiClient.SendEmailsAsync(new Email(Guid.NewGuid(), UserEmailAddress!, _to, _subject, _body, DateTime.Now));
+        }
+
+        CloseComposeEmail();
+    }
 }
