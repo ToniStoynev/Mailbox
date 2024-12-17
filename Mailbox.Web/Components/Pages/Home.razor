@@ -70,6 +70,10 @@ else
                     <td>@appointment.Organizer</td>
                     <td>@appointment.StartTime</td>
                     <td>@appointment.EndTime</td>
+                    @if (!string.IsNullOrEmpty(_appointmentReminder) && appointment.EventName == _appointmentReminder)
+                    {
+                        <td>Reminder: Your event is starting soon!</td>
+                    }
                 </tr>
             }
         }
@@ -166,6 +170,7 @@ else
         private string? _body;
         private string? _event;
         private string? _participants;
+        private string? _appointmentReminder;
         private DateTime? _startDate;
         private DateTime? _endDate;
         private Email? _selectedEmail;
@@ -194,6 +199,12 @@ else
                     if (!IsInteresedInTheAppointment(appointment, UserEmailAddress)) 
                         return;
                     _appointments.Add(appointment);
+                    InvokeAsync(StateHasChanged);
+                });
+                
+                _hubConnection.On<string>("SendNotification", notification =>
+                {
+                    _appointmentReminder = notification;
                     InvokeAsync(StateHasChanged);
                 });
 

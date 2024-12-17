@@ -12,7 +12,6 @@ builder.Host.UseOrleans(siloBuilder =>
     siloBuilder.UseSignalR();
     siloBuilder.AddMemoryGrainStorage("mailbox");
     siloBuilder.UseInMemoryReminderService();
-    //siloBuilder.AddMemoryStreams("mailbox");
 });
 
 // Add service defaults & Aspire client integrations.
@@ -64,6 +63,7 @@ app.MapPost("/scheduleAppointment", async (IGrainFactory grainFactory, [FromBody
         scheduleAppointmentRequest.Participants, 
         scheduleAppointmentRequest.StartTime, 
         scheduleAppointmentRequest.EndTime));
+    
     return Results.Ok();
 });
 
